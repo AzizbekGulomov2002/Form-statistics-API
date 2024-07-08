@@ -20,23 +20,36 @@ class SurveyViewSet(viewsets.ModelViewSet):
 
 class StatisticsView(APIView):
     def get(self, request):
-        statistics = Survey.objects.values('ecommerce_usage').annotate(count=Count('id'))
+        ecommerce_stats = Survey.objects.values('ecommerce_usage').annotate(count=Count('id'))
+        turnover_stats = Survey.objects.values('monthly_turnover').annotate(count=Count('id'))
+        commission_stats = Survey.objects.values('commission_requirement').annotate(count=Count('id'))
         
-        platform_mapping = {
-            'a': 'Telegram',
-            'b': 'Instagram',
-            'c': 'Facebook',
-            'd': 'E-commerce',
-            'e': 'Yoq'
+        ecommerce_mapping = dict(Survey.ECOMMERCE_CHOICES)
+        turnover_mapping = dict(Survey.TURNOVER_CHOICES)
+        commission_mapping = dict(Survey.COMMISSION_CHOICES)
+        
+        formatted_stats = {
+            'ecommerce_usage': [
+                {
+                    'platform': ecommerce_mapping.get(stat['ecommerce_usage'], 'Unknown'),
+                    'count': stat['count']
+                }
+                for stat in ecommerce_stats
+            ],
+            'monthly_turnover': [
+                {
+                    'turnover': turnover_mapping.get(stat['monthly_turnover'], 'Unknown'),
+                    'count': stat['count']
+                }
+                for stat in turnover_stats
+            ],
+            'commission_requirement': [
+                {
+                    'commission': commission_mapping.get(stat['commission_requirement'], 'Unknown'),
+                    'count': stat['count']
+                }
+                for stat in commission_stats
+            ]
         }
         
-        formatted_statistics = [
-            {
-                'platform': platform_mapping.get(stat['ecommerce_usage'], 'Unknown'),
-                'count': stat['count']
-            }
-            for stat in statistics
-        ]
-        
-        serializer = StatisticsSerializer(formatted_statistics, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(formatted_stats, status=status.HTTP_200_OK)
