@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-9ny1_7iqy6zwdze5+d^80@*@61__8feg6f41a1*lj)^*(tc&x6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["amaar-presentation.netlify.app","formapi.pythonanywhere.com"]
+ALLOWED_HOSTS = ["https://amaar-presentation.netlify.app/","https://formapi.pythonanywhere.com"]
 
 
 # Application definition
